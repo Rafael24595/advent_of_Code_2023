@@ -107,8 +107,8 @@ fn exercise_1_2() {
             
             println!("Gear found in line {}{}{}:\n", CONSOLE_POWER, i, CONSOLE_RESET);
 
-            let sw_match = match_gear(lines.clone(), i, postion);
-            result = result + sw_match;
+            let power = match_gear(lines.clone(), i, postion);
+            result = result + power;
         }
         println!("")
     }
@@ -116,26 +116,54 @@ fn exercise_1_2() {
     println!("Result: {}{}{}", CONSOLE_RESULT, result, CONSOLE_RESET);
 }
 
-fn match_gear(lines: Split<&str>, line: usize, position: usize) -> i32 {
+fn match_gear(lines: Split<&str>, line_position: usize, position: usize) -> i32 {
+    let conections = gear_connections(lines, line_position, position);
+
+    print!(" - Gear match: ");
+
+    if conections.len() < 2 {
+        print!("{}NOT FOUND{}.\n\n", CONSOLE_FAIL, CONSOLE_RESET);
+        return 0;
+    }
+
+    let mut power = 1;
+    let mut iter = conections.iter();
+    let mut element = iter.next();
+
+    while element.is_some() {
+        print!("{}{}{}", CONSOLE_SUCESS, element.unwrap(), CONSOLE_RESET);
+        power = power * element.unwrap();
+        element = iter.next();
+        if element.is_some() {
+            print!(" * ");
+        }
+    }
+
+    print!(" = {}{}{}.\n\n", CONSOLE_POWER, power, CONSOLE_RESET);
+
+    return power;
+}
+
+fn gear_connections(lines: Split<&str>, line_position: usize, position: usize) -> Vec<i32> {
     let vector: Vec<&str> = lines.collect();
     let matrix_length = vector.len();
 
-    let mut matrix_start = line;
-    if line > 0 {
-        matrix_start = line - 1;
+    let mut matrix_start = line_position;
+    if line_position > 0 {
+        matrix_start = line_position - 1;
     }
 
-    let mut matrix_end = line;
-    if line < matrix_length -1 {
-        matrix_end = line + 1;
+    let mut matrix_end = line_position;
+    if line_position < matrix_length -1 {
+        matrix_end = line_position + 1;
     }
 
     let mut conections = Vec::new();
 
     for y in matrix_start..matrix_end + 1 {
-        let l = vector.get(y).cloned().unwrap();
-        let r = Regex::new(r"\d+").unwrap();
-        let numbers = r.find_iter(l);
+        let line = vector.get(y).cloned().unwrap();
+        let regex = Regex::new(r"\d+").unwrap();
+        let numbers = regex.find_iter(line);
         for number in numbers {
             let mut start = number.start();
             let end = number.end();
@@ -151,26 +179,5 @@ fn match_gear(lines: Split<&str>, line: usize, position: usize) -> i32 {
         }
     }
 
-    print!(" - Gear match: ");
-
-    if conections.len() < 2 {
-        print!("{}NOT FOUND{}.\n\n", CONSOLE_FAIL, CONSOLE_RESET);
-        return 0;
-    }
-
-    let mut power = 1;
-    let mut iter = conections.iter();
-    let mut element = iter.next();
-    while element.is_some() {
-        print!("{}{}{}", CONSOLE_SUCESS, element.unwrap(), CONSOLE_RESET);
-        power = power * element.unwrap();
-        element = iter.next();
-        if element.is_some() {
-            print!(" * ");
-        }
-    }
-
-    print!(" = {}{}{}.\n\n", CONSOLE_POWER, power, CONSOLE_RESET);
-
-    return power;
+    return conections;
 }
