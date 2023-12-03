@@ -3,6 +3,7 @@ use regex::Regex;
 
 const CONSOLE_RESET: &str = "\x1b[0m";
 const CONSOLE_SUCESS: &str = "\x1b[32m";
+const CONSOLE_POWER: &str = "\x1b[34m";
 const CONSOLE_FAIL: &str = "\x1b[31m";
 const CONSOLE_RESULT: &str = "\x1b[33m";
 
@@ -91,5 +92,85 @@ fn match_area(lines: Split<&str>, line: usize, o_start: usize, o_end: usize) -> 
 */
 
 fn exercise_1_2() {
-    //TODO: TODO.
+    let contents = fs::read_to_string("./resources/EXERCISE_III.txt")
+        .expect("Oh! Something happens! Merry Christmas!");
+
+    let lines = contents.split("\n");
+
+    let mut result = 0;
+
+    for (i, line) in lines.clone().into_iter().enumerate() {
+        let r = Regex::new(r"\*").unwrap();
+        let gears = r.find_iter(line);
+        for gear in gears {
+            let postion = gear.start();
+            
+            println!("Gear found in line {}{}{}:\n", CONSOLE_POWER, i, CONSOLE_RESET);
+
+            let sw_match = match_gear(lines.clone(), i, postion);
+            result = result + sw_match;
+        }
+        println!("")
+    }
+
+    println!("Result: {}{}{}", CONSOLE_RESULT, result, CONSOLE_RESET);
+}
+
+fn match_gear(lines: Split<&str>, line: usize, position: usize) -> i32 {
+    let vector: Vec<&str> = lines.collect();
+    let matrix_length = vector.len();
+
+    let mut matrix_start = line;
+    if line > 0 {
+        matrix_start = line - 1;
+    }
+
+    let mut matrix_end = line;
+    if line < matrix_length -1 {
+        matrix_end = line + 1;
+    }
+
+    let mut conections = Vec::new();
+
+    for y in matrix_start..matrix_end + 1 {
+        let l = vector.get(y).cloned().unwrap();
+        let r = Regex::new(r"\d+").unwrap();
+        let numbers = r.find_iter(l);
+        for number in numbers {
+            let mut start = number.start();
+            let end = number.end();
+            let value = number.as_str();
+
+            if start > 0 {
+                start = start - 1;
+            }
+
+            if position >= start && position <= end {
+                conections.push(value.parse::<i32>().unwrap());
+            }
+        }
+    }
+
+    print!(" - Gear match: ");
+
+    if conections.len() < 2 {
+        print!("{}NOT FOUND{}.\n\n", CONSOLE_FAIL, CONSOLE_RESET);
+        return 0;
+    }
+
+    let mut power = 1;
+    let mut iter = conections.iter();
+    let mut element = iter.next();
+    while element.is_some() {
+        print!("{}{}{}", CONSOLE_SUCESS, element.unwrap(), CONSOLE_RESET);
+        power = power * element.unwrap();
+        element = iter.next();
+        if element.is_some() {
+            print!(" * ");
+        }
+    }
+
+    print!(" = {}{}{}.\n\n", CONSOLE_POWER, power, CONSOLE_RESET);
+
+    return power;
 }
