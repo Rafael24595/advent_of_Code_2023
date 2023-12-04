@@ -13,6 +13,13 @@ pub(crate) fn main() {
 }
 
 fn exercise_1_1() {
+
+    println!("\n");
+    println!("----------------");
+    println!("| EXERCISE 3.1 |");
+    println!("----------------");
+    println!("\n");
+
     let contents = fs::read_to_string("./resources/EXERCISE_III.txt")
         .expect("Oh! Something happens! Merry Christmas!");
 
@@ -92,6 +99,13 @@ fn match_area(lines: Split<&str>, line: usize, o_start: usize, o_end: usize) -> 
 */
 
 fn exercise_1_2() {
+
+    println!("\n");
+    println!("----------------");
+    println!("| EXERCISE 3.2 |");
+    println!("----------------");
+    println!("\n");
+
     let contents = fs::read_to_string("./resources/EXERCISE_III.txt")
         .expect("Oh! Something happens! Merry Christmas!");
 

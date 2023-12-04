@@ -7,6 +7,13 @@ pub(crate) fn main() {
 }
 
 fn exercise_1_1() {
+
+    println!("\n");
+    println!("----------------");
+    println!("| EXERCISE 1.1 |");
+    println!("----------------");
+    println!("\n");
+
     let contents = fs::read_to_string("./resources/EXERCISE_I.txt")
         .expect("Oh! Something happens! Merry Christmas!");
 
@@ -44,6 +51,13 @@ fn exercise_1_1() {
 */
 
 fn exercise_1_2() {
+
+    println!("\n");
+    println!("----------------");
+    println!("| EXERCISE 1.2 |");
+    println!("----------------");
+    println!("\n");
+
     let contents = fs::read_to_string("./resources/EXERCISE_I.txt")
         .expect("Oh! Something happens! Merry Christmas!");
 

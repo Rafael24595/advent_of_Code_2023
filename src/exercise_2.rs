@@ -26,7 +26,12 @@ pub (crate) fn main() {
 }
 
 fn exercise_1() {
-    println!("EXERCISE 2.1");
+    
+    println!("\n");
+    println!("----------------");
+    println!("| EXERCISE 2.1 |");
+    println!("----------------");
+    println!("\n");
 
     let contents = fs::read_to_string("./resources/EXERCISE_II.txt")
         .expect("Oh! Something happens! Merry Christmas!");
@@ -105,7 +110,12 @@ fn game_1(game: &str) -> bool {
 */
 
 fn exercise_2() {
-    println!("EXERCISE 2.2");
+
+    println!("\n");
+    println!("----------------");
+    println!("| EXERCISE 2.2 |");
+    println!("----------------");
+    println!("\n");
 
     let contents = fs::read_to_string("./resources/EXERCISE_II.txt")
         .expect("Oh! Something happens! Merry Christmas!");
