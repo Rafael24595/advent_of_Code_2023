@@ -111,7 +111,8 @@ fn exercise_1_2() {
             .filter(|n| !n.is_empty())
             .map(|n| n.trim().parse::<i32>().unwrap())
             .collect();
-        cards = evalue_2(cards, number, winners, numbers);
+        
+        cards = update_cards(cards, number, winners, numbers);
 
         println!("");
     }
@@ -124,7 +125,7 @@ fn exercise_1_2() {
     println!("Result: {}{}{}", CONSOLE_RESULT, result, CONSOLE_RESET);
 }
 
-fn evalue_2(mut cards: HashMap<i32, i32>, card: i32, winners: Vec<i32>, numbers: Vec<i32>) -> HashMap<i32, i32> {
+fn update_cards(mut cards: HashMap<i32, i32>, card: i32, winners: Vec<i32>, numbers: Vec<i32>) -> HashMap<i32, i32> {
     let amount = get_card(cards.clone(), card);
     print!("Card {}{}{} instances: {}{}{} - Childs [\n", CONSOLE_RESULT, card, CONSOLE_RESET, 
         CONSOLE_POWER, amount, CONSOLE_RESET);
