@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, time::SystemTime};
 
 use crate::_utils::CONSOLE_COLORS;
 
@@ -76,11 +76,21 @@ fn exercise_1_2() {
     let contents = fs::read_to_string("./resources/EXERCISE_VI.txt")
         .expect("Oh! Something happens! Merry Christmas!");
 
-    let race_result = parse_fixed_results(contents);
+    let race_result = &parse_fixed_results(contents);
 
-    let result = evalue(race_result, None);
+    let start = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).expect("Time went backwards").as_micros();
+    let result = evalue(race_result.clone(), None);
+    let end = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).expect("Time went backwards").as_micros(); 
 
-    println!("Result: {}", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result));
+    let start_o = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).expect("Time went backwards").as_micros();
+    let left_edge = find_edge_l(race_result.clone());
+    let right_edge = find_edge_r(race_result.clone());
+    let end_o = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).expect("Time went backwards").as_micros(); 
+
+    let result_optimized = right_edge -left_edge;
+    
+    println!("Result brute-force: {} - Time: {} μs", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result), CONSOLE_COLORS::CONSOLE_FAIL.wrap(end - start));
+    println!("Result range-optimized: {} - Time: {} μs", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result_optimized), CONSOLE_COLORS::CONSOLE_FAIL.wrap(end_o - start_o));
 }
 
 fn parse_fixed_results(contents: String) -> Vec<i64> {
@@ -103,6 +113,34 @@ fn parse_fixed_line(line: &str) -> i64 {
         .parse::<i64>().unwrap();
 }
 
+fn find_edge_r(race_result: Vec<i64>) -> i64 {
+    let time = *race_result.get(0).unwrap();
+    let distance = *race_result.get(1).unwrap();
+    for i in (0..time).rev() {
+        let speed = i;
+        let time_remain = time - i;
+        let distance_final = speed * time_remain;
+        if distance_final > distance {
+            return i;
+        }
+    }
+    return 0;
+}
+
+fn find_edge_l(race_result: Vec<i64>) -> i64 {
+    let time = *race_result.get(0).unwrap();
+    let distance = *race_result.get(1).unwrap();
+    for i in 0..time {
+        let speed = i;
+        let time_remain = time - i;
+        let distance_final = speed * time_remain;
+        if distance_final > distance {
+            return i - 1;
+        }
+    }
+    return 0;
+}
+
 /*
 *
 * -------------------------------> MISC UTILS <-------------------------------
@@ -113,7 +151,9 @@ fn evalue(race_results: Vec<i64>, show: Option<bool>) -> i64 {
     let mut count = 0;
     let time = *race_results.get(0).unwrap();
     let distance = *race_results.get(1).unwrap();
-    println!("Time: {} - Distance: {}: ", CONSOLE_COLORS::CONSOLE_RESULT.wrap(time), CONSOLE_COLORS::CONSOLE_POWER.wrap(distance));
+    if show.is_some() && show.unwrap() {
+        println!("Time: {} - Distance: {}: ", CONSOLE_COLORS::CONSOLE_RESULT.wrap(time), CONSOLE_COLORS::CONSOLE_POWER.wrap(distance));
+    }
     for i in 0..time {
         let speed = i;
         let time_remain = time - i;
