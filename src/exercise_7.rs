@@ -44,23 +44,6 @@ fn exercise_1_1() {
     println!("Result: {}", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result));
 }
 
-fn parse_results(contents: String) -> Vec<(String, i32)> {
-    let mut tuples = Vec::new();
-    for line in contents.split("\n") {
-        tuples.push(parse_line(line));
-    }
-
-    return tuples;
-}
-
-fn parse_line(line: &str) -> (String, i32) {
-    let values: Vec<&str> = line.trim().split(" ").collect();
-    return (
-        values.first().unwrap().to_string(), 
-        values.last().unwrap().parse::<i32>().unwrap()
-    );
-}
-
 /*
 *
 * -----------------------------> SECOND ROUND <-----------------------------
@@ -154,13 +137,8 @@ fn compare_cards(cards_map: BTreeMap<char, usize>, cards1: &String, cards2: &Str
         hand2 = manage_joker(hand2);
     }
 
-    let mut sum1 = 0;
-    let mut sum2 = 0;
-
-    for (pos, _) in hand1.iter().enumerate() {
-        sum1 = sum1 + hand1.get(pos).unwrap() * hand1.get(pos).unwrap();
-        sum2 = sum2 + hand2.get(pos).unwrap() * hand2.get(pos).unwrap();
-    }
+    let sum1 = hand1.iter().fold(0, |mut r, &val| {r = r + val * val; r});
+    let sum2 = hand2.iter().fold(0, |mut r, &val| {r = r + val * val; r});
 
     if sum1 > sum2 {
         return Ordering::Greater;
@@ -174,4 +152,21 @@ fn compare_cards(cards_map: BTreeMap<char, usize>, cards1: &String, cards2: &Str
     }
 
     return aux_order.unwrap();
+}
+
+fn parse_results(contents: String) -> Vec<(String, i32)> {
+    let mut tuples = Vec::new();
+    for line in contents.split("\n") {
+        tuples.push(parse_line(line));
+    }
+
+    return tuples;
+}
+
+fn parse_line(line: &str) -> (String, i32) {
+    let values: Vec<&str> = line.trim().split(" ").collect();
+    return (
+        values.first().unwrap().to_string(), 
+        values.last().unwrap().parse::<i32>().unwrap()
+    );
 }
