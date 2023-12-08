@@ -31,3 +31,23 @@ impl CONSOLE_COLORS {
     }
 
 }
+
+pub fn gcd(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        let temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+pub fn lcm(a: u64, b: u64) -> u64 {
+    if a == 0 || b == 0 {
+        return 0;
+    }
+    return (a * b) / gcd(a, b);
+}
+
+pub fn lcm_vector(numbers: Vec<u64>) -> u64 {
+    numbers.into_iter().fold(1, |a, b| lcm(a, b))
+}
