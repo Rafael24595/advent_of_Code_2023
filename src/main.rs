@@ -9,6 +9,7 @@ pub mod exercise_6;
 pub mod exercise_7;
 pub mod exercise_8;
 pub mod exercise_9;
+pub mod exercise_10;
 
 fn main() {
     /* 01/12/2023 */
@@ -29,5 +30,7 @@ fn main() {
     exercise_8::main();
     /* 09/12/2023 */
     exercise_9::main();
+    /* 10/12/2023 */
+    exercise_10::main();
     /*    ....    */
 }
