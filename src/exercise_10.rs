@@ -1,6 +1,7 @@
-use std::fs;
+use std::{fs, ops::Range};
 use crate::_utils::CONSOLE_COLORS;
 
+const POINT_WRAPPED: char = 'I';
 const POINT_OUT: char = '#';
 const POINT_START: char = 'S';
 const POINT_GROUND: char = '.';
@@ -38,27 +39,124 @@ fn exercise_1_1() {
 
     let result = evalue(start, matrix);
 
+    println!("Result: {}", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result.0));
+}
+
+
+/*
+*
+* -----------------------------> SECOND ROUND <-----------------------------
+*
+*/
+
+fn exercise_1_2() {
+
+    println!("\n");
+    println!("-----------------");
+    println!("| EXERCISE 10.2 |");
+    println!("-----------------");
+    println!("\n");
+
+    let contents = fs::read_to_string("./resources/EXERCISE_X.txt")
+        .expect("Oh! Something happens! Merry Christmas!");
+
+    let matrix = &parse_matrix(contents);
+    let start = find_entrance(matrix).unwrap();
+
+    let path = &evalue(start, matrix).1;
+
+    let clean_matrix = &clean_path(path, matrix);
+
+    let result = evalue_tiles(clean_matrix);
+
     println!("Result: {}", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result));
 }
 
-fn evalue(start: (usize, usize), matrix: &Vec<Vec<char>>) -> i64 {
+fn clean_path(path: &Vec<(usize, usize)> , matrix: &Vec<Vec<char>>) -> Vec<Vec<char>> {
+    let mut cleaned = matrix.clone();
+    for (y, row) in matrix.iter().enumerate() {
+        for (x, _) in row.iter().enumerate() {
+            if !path.contains(&(y, x)) {
+                cleaned[y][x] = POINT_GROUND;
+            }
+        }
+    }
+    return cleaned;
+}
+
+fn evalue_tiles(matrix: &Vec<Vec<char>>) -> i64 {
+    let mut tiles = 0;
+
+    for row in matrix.iter() {
+        for (i, &base) in row.iter().enumerate() {
+            if evalue_character(base, i, row) {
+                tiles += 1;
+                continue;
+            }
+
+        }
+    }
+    return tiles;
+}
+
+fn evalue_character(base: char, position: usize, row: &Vec<char>) -> bool {
+    if base != POINT_GROUND {
+        return false;
+    }
+
+    let mut walls = 0;
+    let mut corners = Vec::new();
+    for &character in row.iter().skip(position + 1) {
+        match character {
+            POINT_PIPE_NS => 
+                walls += 1,
+            POINT_PIPE_SE | POINT_PIPE_NE => 
+                corners.push(character),
+            POINT_PIPE_NW if !corners.is_empty() && *corners.last().unwrap() == POINT_PIPE_SE => {
+                corners.pop();
+                walls += 1;
+            }
+            POINT_PIPE_SW if !corners.is_empty() && *corners.last().unwrap() == POINT_PIPE_NE => {
+                corners.pop();
+                walls += 1;
+            }
+            _ => {}
+        }
+    }
+
+    if walls % 2 == 1 {
+        return true;
+    }
+
+    return false;
+}
+
+/*
+*
+* -------------------------------> MISC UTILS <-------------------------------
+*
+*/
+
+fn evalue(start: (usize, usize), matrix: &Vec<Vec<char>>) -> (i64, Vec<(usize, usize)>) {
     let mut sw_exit = false;
     let mut steps = 0;
 
     let mut current = start;
     let mut direction: i32 = DIRECTION_VOID;
+    let mut path: Vec<(usize, usize)> = Vec::new();
 
     while !sw_exit {
         let result = evalue_step(direction, current, matrix);
         current = result.1;
         direction = result.0;
+        path.push(current);
         steps = steps + 1;
         if current.0 == start.0 && current.1 == start.1 {
             sw_exit = true;
         }
     }
 
-    return steps / 2;
+    return(steps / 2, path);
 }
 
 fn evalue_step(last_direction: i32, step: (usize, usize), matrix: &Vec<Vec<char>>) -> (i32, (usize, usize)) {
@@ -243,21 +341,4 @@ fn find_entrance(matrix: &Vec<Vec<char>>) -> Option<(usize, usize)> {
         }
     }
     return None;
-}
-
-/*
-*
-* -----------------------------> SECOND ROUND <-----------------------------
-*
-*/
-
-fn exercise_1_2() {
-
-    println!("\n");
-    println!("-----------------");
-    println!("| EXERCISE 10.2 |");
-    println!("-----------------");
-    println!("\n");
-
-    //TODO: TODO.
 }
