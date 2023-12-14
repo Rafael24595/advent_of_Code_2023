@@ -14,7 +14,7 @@ fn exercise_1_1() {
     
     println!("\n");
     println!("-----------------");
-    println!("| EXERCISE 10.1 |");
+    println!("| EXERCISE 11.1 |");
     println!("-----------------");
     println!("\n");
 
@@ -42,7 +42,7 @@ fn exercise_1_2() {
 
     println!("\n");
     println!("-----------------");
-    println!("| EXERCISE 10.1 |");
+    println!("| EXERCISE 11.1 |");
     println!("-----------------");
     println!("\n");
 
@@ -73,7 +73,6 @@ fn evalue(pointers: &Vec<(char, usize, usize)>, spaces_map: &(Vec<usize>, Vec<us
         for pointer_b in pointers {
             if pointer_a != pointer_b {
                 let fix_count = find_spaces(pointer_a, pointer_b, spaces_map) as i64;
-                //println!("{} - {} -> {}", pointer_a.0, pointer_b.0, fix_count);
                 let y_distance = (pointer_a.1 as i64 - pointer_b.1 as i64).abs();
                 let x_distance = (pointer_a.2 as i64 - pointer_b.2 as i64).abs();
                 if pairs_relation.contains_key(&(pointer_b, pointer_a)) {
