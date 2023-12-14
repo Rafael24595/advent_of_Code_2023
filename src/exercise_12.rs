@@ -22,6 +22,32 @@ fn exercise_1_1() {
     println!("-----------------");
     println!("\n");
 
+    let contents = fs::read_to_string("./resources/EXERCISE_XII.txt")
+        .expect("Oh! Something happens! Merry Christmas!");
+    
+    let springs_map = &parse_input(contents);
+    let result = springs_map.iter()
+        .fold(0, |l, a| {
+            let table = &evalue(&a.0, &a.1, None, Some(true));
+            l + table.last().unwrap().last().unwrap()
+        });
+
+    println!("Result: {}\n", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result));
+}
+
+/*
+*
+* -----------------------------> SECOND ROUND <-----------------------------
+*
+*/
+
+fn exercise_1_2() {
+
+    println!("\n");
+    println!("-----------------");
+    println!("| EXERCISE 12.1 |");
+    println!("-----------------");
+    println!("\n");
 
     let contents = fs::read_to_string("./resources/EXERCISE_XII.txt")
         .expect("Oh! Something happens! Merry Christmas!");
@@ -29,17 +55,27 @@ fn exercise_1_1() {
     let springs_map = &parse_input(contents);
     let result = springs_map.iter()
         .fold(0, |l, a| {
-            let table = &evalue(&a.0, &a.1);
-            print_table(&a.0, &a.1, table);
+            let table = &evalue(&a.0, &a.1, Some(5), None);
             l + table.last().unwrap().last().unwrap()
         });
 
     println!("Result: {}\n", CONSOLE_COLORS::CONSOLE_RESULT.wrap(result));
 }
 
-fn evalue(o_springs_map: &Vec<char>, o_sizes: &Vec<usize>) -> Vec<Vec<usize>> {
-    let springs_map = &fix_springs_map(o_springs_map);
-    let sizes = &fix_sizes(o_sizes);
+/*
+*
+* -------------------------------> MISC UTILS <-------------------------------
+*
+*/
+
+fn evalue(o_springs_map: &Vec<char>, o_sizes: &Vec<usize>, op_multiplier: Option<usize>, o_show: Option<bool>) -> Vec<Vec<usize>> {
+    let mut show = false;
+    if o_show.is_some() {
+        show = o_show.unwrap();
+    }
+
+    let springs_map = &fix_springs_map(o_springs_map, op_multiplier);
+    let sizes = &fix_sizes(o_sizes, op_multiplier);
 
     let mut table: Vec<Vec<usize>> = Vec::new();
     table.push(build_base_row(springs_map));
@@ -66,6 +102,10 @@ fn evalue(o_springs_map: &Vec<char>, o_sizes: &Vec<usize>) -> Vec<Vec<usize>> {
         table.push(row_count);
     }
 
+    if show {
+        print_table(springs_map, sizes, &table);
+    }
+
     return table;
 }
 
@@ -81,15 +121,35 @@ fn build_base_row(springs_map: &Vec<char>) -> Vec<usize> {
     return row_base;
 }
 
-fn fix_springs_map(o_springs_map: &Vec<char>) -> Vec<char> {
-    let mut springs_map = o_springs_map.clone();
+fn fix_springs_map(o_springs_map: &Vec<char>, op_multiplier: Option<usize>) -> Vec<char> {
+    let mut multiplier = 1;
+    if op_multiplier.is_some() {
+        multiplier = op_multiplier.unwrap();
+    }
+    let mut springs_map: Vec<char> = o_springs_map.iter().cloned()
+        .cycle()
+        .take(multiplier * o_springs_map.len())
+        .enumerate()
+        .flat_map(|(i, ch)| 
+            if i % o_springs_map.len() == 0 && i != 0 { 
+                vec![POINT_STATELESS, ch] 
+            } else { 
+                vec![ch] 
+            })
+        .collect();
     springs_map.reverse();
     springs_map.insert(0, POINT_CONTROL);
     return springs_map;
 }
 
-fn fix_sizes(o_sizes: &Vec<usize>) -> Vec<usize> {
-    let mut sizes = o_sizes.clone();
+fn fix_sizes(o_sizes: &Vec<usize>, op_multiplier: Option<usize>) -> Vec<usize> {
+    let mut multiplier = 1;
+    if op_multiplier.is_some() {
+        multiplier = op_multiplier.unwrap();
+    }
+    let mut sizes: Vec<usize> = o_sizes.iter().cloned()
+        .cycle()
+        .take(multiplier * o_sizes.len()).collect();
     sizes.reverse();
     return sizes;
 }
@@ -136,21 +196,4 @@ fn parse_input(contents: String) -> Vec<(Vec<char>, Vec<usize>)> {
     }
 
     return springs_map;
-}
-
-/*
-*
-* -----------------------------> SECOND ROUND <-----------------------------
-*
-*/
-
-fn exercise_1_2() {
-
-    println!("\n");
-    println!("-----------------");
-    println!("| EXERCISE 12.1 |");
-    println!("-----------------");
-    println!("\n");
-
-    //TODO: TODO.
 }
